@@ -1,0 +1,43 @@
+
+/* Wrapper */
+.app-wrapper {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* FIXED Background */
+.global-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  z-index: -2;
+  transform: scale(1.02); /* avoids white edges */
+}
+
+/* Dark cinematic overlay */
+.global-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  background: rgba(5, 10, 30, 0.75);
+  backdrop-filter: blur(2px);
+
+  z-index: -1;
+}
+
+/* App content */
+.app-content {
+  position: relative;
+  z-index: 1;
+}

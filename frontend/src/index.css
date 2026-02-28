@@ -1,0 +1,313 @@
+@import "tailwindcss";
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  background: transparent;
+}
+@keyframes civilPulse {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+  100% { transform: translate(-50%, -55%) scale(1.1); opacity: 0.8; }
+}
+.animate-civilPulse {
+  animation: civilPulse 8s ease-in-out infinite alternate;
+}
+
+@keyframes civilPulseSlow {
+  0% { transform: scale(1); opacity: 0.3; }
+  100% { transform: scale(1.15); opacity: 0.5; }
+}
+.animate-civilPulseSlow {
+  animation: civilPulseSlow 12s ease-in-out infinite alternate;
+}
+/* Civil AI Glow Animation */
+@keyframes civilPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(-50%, -55%) scale(1.12);
+    opacity: 0.85;
+  }
+}
+
+.civil-pulse {
+  animation: civilPulse 8s ease-in-out infinite alternate;
+}
+
+/* Secondary Glow */
+@keyframes civilPulseSlow {
+  0% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(1.15);
+    opacity: 0.6;
+  }
+}
+
+.civil-pulse-slow {
+  animation: civilPulseSlow 12s ease-in-out infinite alternate;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+.download-actions{
+  display:flex;
+  gap:10px;
+  margin-top:15px;
+}
+
+.download-actions button{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  background:#4f46e5;
+  padding:6px 14px;
+  border-radius:6px;
+  transition:0.3s;
+}
+
+.download-actions button:hover{
+  transform:scale(1.05);
+  background:#6366f1;
+}
+.upload-wrapper{
+  display:flex;
+  justify-content:center;
+  padding:40px;
+}
+
+.upload-panel{
+  width:800px;
+  background:rgba(10,15,44,0.5);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(56,189,248,0.2);
+  border-radius:16px;
+  padding:30px;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+  animation:fadeIn 0.4s ease;
+}
+
+.upload-title{
+  display:flex;
+  gap:10px;
+  font-size:24px;
+  color:#7dd3fc;
+}
+
+.upload-card{
+  display:flex;
+  gap:15px;
+}
+
+.module-switch{
+  display:flex;
+  gap:10px;
+}
+
+.module-switch label{
+  display:flex;
+  gap:6px;
+  padding:6px 14px;
+  border:1px solid #38bdf8;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.module-switch label.active{
+  background:#38bdf8;
+  color:black;
+}
+
+.report-card{
+  background:rgba(10,15,44,0.6);
+  padding:20px;
+  border-radius:12px;
+  border:1px solid rgba(56,189,248,0.2);
+}
+
+.download-actions{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+
+.download-actions button{
+  background:#4f46e5;
+  padding:6px 14px;
+  border-radius:6px;
+}
+.upload-row{
+  display:flex;
+  gap:15px;
+  align-items:center;
+}
+
+.file-upload{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  padding:8px 16px;
+  border:1px solid #38bdf8;
+  border-radius:8px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.file-upload:hover{
+  background:#38bdf8;
+  color:black;
+}
+
+.upload-btn{
+  background:#4f46e5;
+  padding:8px 16px;
+  border-radius:8px;
+  transition:0.3s;
+}
+
+.upload-btn:hover{
+  transform:scale(1.05);
+}
+
+.download-btn{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 14px;
+  border:1px solid #38bdf8;
+  border-radius:8px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.download-btn:hover{
+  background:#38bdf8;
+  color:black;
+}
+.ai-card {
+  @apply flex items-center gap-4 p-4 rounded-xl
+  bg-gradient-to-br from-[#0a0f2c] to-[#050816]
+  border border-blue-400/20
+  shadow-[0_0_25px_rgba(56,189,248,0.25)]
+  hover:scale-105 transition;
+}
+
+.timeline-card {
+  @apply p-4 rounded-lg
+  bg-black/40
+  border border-indigo-400/20
+  backdrop-blur-md;
+}
+
+.pipeline-card {
+  @apply p-4 rounded-lg
+  bg-black/40
+  border border-blue-400/20
+  backdrop-blur-md;
+}
+
+.total-duration {
+  @apply text-center mt-4 text-indigo-300 font-semibold;
+}
+.est-card{
+  @apply bg-gradient-to-br from-[#0a0f2c] to-[#050816]
+  backdrop-blur-xl
+  border
+  rounded-xl
+  p-5
+  transition
+  hover:scale-105
+  hover:shadow-[0_0_50px_rgba(56,189,248,0.3)];
+}
+
+.est-title{
+  @apply flex items-center gap-2 mb-4 text-lg font-semibold;
+}
+
+.est-row{
+  @apply text-sm text-gray-300 mb-1 border-b border-white/5 pb-1;
+}
+
+.download-btn{
+  @apply flex items-center gap-2
+  bg-indigo-600
+  px-5 py-2
+  rounded-lg
+  hover:scale-105
+  hover:bg-indigo-500
+  transition
+  shadow-lg;
+}
+.timeline-roadmap{
+  @apply bg-gradient-to-br from-[#0a0f2c] to-[#050816]
+  border border-indigo-400/20
+  rounded-xl
+  p-6
+  backdrop-blur-xl
+  shadow-[0_0_40px_rgba(99,102,241,0.2)];
+}
+
+.timeline-title{
+  @apply flex items-center gap-2
+  text-xl
+  text-blue-200
+  mb-6;
+}
+
+.timeline-container{
+  @apply flex flex-col gap-6 relative;
+}
+
+.timeline-step{
+  @apply flex items-center gap-4 relative;
+}
+
+.timeline-line{
+  @apply absolute left-4 top-0 h-full w-[2px]
+  bg-indigo-500 opacity-30;
+}
+
+.timeline-circle{
+  @apply w-10 h-10
+  flex items-center justify-center
+  rounded-full
+  bg-indigo-600
+  shadow-[0_0_20px_rgba(99,102,241,0.5)]
+  text-lg;
+}
+
+.timeline-content{
+  @apply bg-black/40
+  border border-white/10
+  rounded-lg
+  px-4 py-2
+  backdrop-blur-md;
+}
+
+.timeline-phase{
+  @apply text-blue-300 font-semibold text-sm;
+}
+
+.timeline-duration{
+  @apply text-gray-400 text-xs;
+}
+
+.timeline-total{
+  @apply mt-6 text-center text-indigo-300 font-semibold;
+}

@@ -1,0 +1,89 @@
+.dashboard-container {
+  height: 100vh;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Dark Overlay */
+.dashboard-overlay {
+  height: 100%;
+  width: 100%;
+  background: rgba(5, 10, 30, 0.75);
+  backdrop-filter: blur(2px);
+  padding: 60px;
+  color: white;
+}
+
+/* HERO SECTION */
+.hero-section {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 70vh;
+}
+
+.hero-text {
+  max-width: 420px;
+  background: rgba(0,0,0,0.35);
+  padding: 30px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  animation: fadeIn 1s ease;
+}
+
+.hero-text h1 {
+  font-size: 36px;
+  margin-bottom: 15px;
+}
+
+.hero-text p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #d1d5db;
+  margin-bottom: 20px;
+}
+
+.hero-btn {
+  background: #4f46e5;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.hero-btn:hover {
+  background: #6366f1;
+  transform: scale(1.05);
+}
+
+/* PROJECT SECTION */
+.project-section {
+  margin-top: 40px;
+  background: rgba(255,255,255,0.05);
+  padding: 25px;
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+}
+
+.project-section h2 {
+  margin-bottom: 15px;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
