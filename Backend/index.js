@@ -20,6 +20,12 @@ const PORT = process.env.PORT || 3000;
 
 app.use("/api/auth", authRoutes);
 // console.log(projectRoutes);
+app.use("/api/projects",projectRoutes);
+app.use("/api/drawings",drawingRoutes);
+app.use("/api/estimation",estimationRoutes);
+app.use("/api/timeline",timelineRoutes);
+app.use("/api/reports", reportRoutes);
+app.use("/api/rates",rateRoutes)
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
