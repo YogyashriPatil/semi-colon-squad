@@ -2,7 +2,9 @@ import mongoose from "mongoose";
 
 const rateSchema = new mongoose.Schema({
   material: String,
-  rate: Number,
+  budget: Number,
+  standard: Number,
+  premium: Number,
   unit: String
 });
 

@@ -5,13 +5,18 @@ import Estimation from "../models/Estimation.js";
 // 🔹 Create Project
 export const createProject = async (req, res) => {
   try {
+    console.log("BODY:", req.body);
+    console.log("REQ USER:", req.user); // 👈 ADD TH
+    // if (!req.user) {
+    //   return res.status(401).json({ message: "User not authorized" });
+    // }
     const { projectName, location, projectType } = req.body;
-
+    console.log(req.user._id)
     const project = await Project.create({
       projectName,
       location,
       projectType,
-      createdBy: req.user.id
+      createdBy: req.user._id
     });
 
     res.status(201).json(project);

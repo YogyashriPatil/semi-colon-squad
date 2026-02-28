@@ -7,16 +7,11 @@ const estimationSchema = new mongoose.Schema(
       ref: "Drawing",
       required: true
     },
-    quantities: {
-      concrete: Number,
-      steel: Number,
-      bricks: Number
-    },
-    costBreakdown: {
-      concreteCost: Number,
-      steelCost: Number,
-      brickCost: Number,
-      totalCost: Number
+
+    // 🔹 New dynamic estimate
+    estimate: {
+      type: mongoose.Schema.Types.Mixed,
+      required: true
     }
   },
   { timestamps: true }

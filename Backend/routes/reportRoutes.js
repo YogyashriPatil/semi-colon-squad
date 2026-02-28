@@ -1,9 +1,9 @@
 import express from "express";
 import protect from "../middleware/authMiddleware.js";
-import { exportProjectPDF } from "../controllers/reportController.js";
+import { generateReport } from "../controllers/reportController.js";
 
 const router = express.Router();
 
-router.get("/:projectId/export", protect, exportProjectPDF);
+router.get("/:drawingId", protect, generateReport);
 
 export default router;

@@ -5,6 +5,7 @@ import { uploadDrawing } from "../controllers/drawingController.js";
 
 const router = express.Router();
 
-router.post("/upload", protect, upload.single("drawing"), uploadDrawing);
+router.post("/upload/:projectId", protect, upload.single("drawing"), uploadDrawing);
+// router.post("/upload", upload.single("drawing"), uploadDrawing);
 
 export default router;

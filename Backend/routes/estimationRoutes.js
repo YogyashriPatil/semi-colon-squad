@@ -4,6 +4,6 @@ import { generateEstimation } from "../controllers/estimationController.js";
 
 const router = express.Router();
 
-router.post("/generate", protect, generateEstimation);
+router.post("/:drawingId", protect, generateEstimation);
 
 export default router;

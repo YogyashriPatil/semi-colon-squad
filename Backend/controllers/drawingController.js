@@ -4,12 +4,15 @@ import axios from "axios";
 import path from "path";
 export const uploadDrawing = async (req, res) => {
   try {
-    const { projectId } = req.body;
-
+    const { projectId } = req.params;
+    console.log(req.params)
+    console.log("Params:", req.params);
+    console.log("Logged User:", req.user._id);
     const project = await Project.findOne({
       _id: projectId,
-      createdBy: req.user.id
+      createdBy: req.user._id
     });
+    console.log("Matched Project:", project);
 
     if (!project)
       return res.status(404).json({ message: "Project not found" });
@@ -23,11 +26,11 @@ export const uploadDrawing = async (req, res) => {
      // 🔹 Step 2: Fix Windows path
     const safePath = path.resolve(drawing.filePath).replace(/\\/g, "/");
     console.log("Sending to AI:", safePath);
-    // 🔹 Step 3: Call AI microservice
+    // // 🔹 Step 3: Call AI microservice
     const aiResponse = await axios.post("http://localhost:8000/analyze", {
       filePath: safePath
     });
-     // 🔹 Step 4: Save analysis result
+    //  // 🔹 Step 4: Save analysis result
     drawing.status = "completed";
     drawing.analysisResult = aiResponse.data;
     drawing.filePath = safePath; // optional cleanup

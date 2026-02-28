@@ -10,9 +10,7 @@ const projectSchema = new mongoose.Schema(
       type: String
     },
     projectType: {
-      type: String,
-      enum: ["residential", "commercial"],
-      default: "residential"
+      type: String
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
