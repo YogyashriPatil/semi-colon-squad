@@ -7,146 +7,171 @@ import {
   getFuelPrice,
   getTransportFactor
 } from "../services/pricingService.js";
-const generateQuantities = (analysis) => {
 
-  const wallHeight = 10;      // ft
-  const wallThickness = 0.75; // ft
 
-  const masonryVolume =
-    (analysis.wallLength || 0) *
-    wallHeight *
-    wallThickness;
-
-  const paintArea =
-    (analysis.wallLength || 0) * 2.5;
-
-  return {
-
-    // structure
-    concrete: analysis.concrete || 0,
-    steel: analysis.steel || 0,
-
-    // masonry
-    masonry: masonryVolume,
-
-    // flooring
-    flooring: analysis.floorArea || 0,
-
-    // plumbing
-    plumbingPoints: (analysis.bathrooms || 1) * 5,
-
-    // electrical
-    electricalPoints: (analysis.rooms || 1) * 4,
-
-    // finishing
-    paintArea,
-
-    // fixtures
-    fixtures:
-      (analysis.doors || 0) +
-      (analysis.windows || 0),
-
-    // labour
-    labour: (analysis.floorArea || 0) * 0.8
-  };
+// 🔹 Avg Rates
+const avgRates = {
+  concrete: 5000,
+  masonry: 250,
+  flooring: 100,
+  plumbing: 5500,
+  electrical: 3500,
+  paint: 30,
+  fixture: 1800,
+  labour: 800,
+  steel: 75
 };
 
+// 🔹 Avg Quantities (fallback if analysis missing)
+const avgQty = {
+  concrete: 120,
+  steel: 3500,
+  masonry: 900,
+  flooring: 1200,
+  plumbingPoints: 10,
+  electricalPoints: 12,
+  paintArea: 2000,
+  fixtures: 8,
+  labour: 960
+};
+
+
 export const generateEstimation = async (req, res) => {
-  const defaultRates = {
-    concrete: 4500,
-    masonry: 200,
-    flooring: 80,
-    plumbing: 5000,
-    electrical: 3000,
-    paint: 25,
-    fixture: 1500,
-    labour: 700
-  };
+
   try {
+
     const { drawingId } = req.params;
-    console.log("BODY RECEIVED:", req.body);
+
     const drawing = await Drawing.findById(drawingId);
 
-    if (!drawing || !drawing.analysisResult)
-      return res.status(400).json({ message: "Analysis not ready" });
+    let analysis = drawing?.analysisResult
+      ? (typeof drawing.analysisResult === "string"
+          ? JSON.parse(drawing.analysisResult)
+          : drawing.analysisResult)
+      : {};
 
-    const analysis = drawing.analysisResult;
-    // 🔥 GET LIVE MARKET DATA
-    const steelRate = await getSteelRate();
-    const fuelPrice = await getFuelPrice();
-    const transportFactor = getTransportFactor(fuelPrice);
-    // 🔹 Step 1: Generate quantities
-    const quantities = generateQuantities(analysis);
+    // 🔹 Safe Quantity Generator
+    const quantities = {
+      concrete: analysis.concrete || avgQty.concrete,
+      steel: analysis.steel || avgQty.steel,
+      masonry: analysis.wallLength
+        ? analysis.wallLength * 10 * 0.75
+        : avgQty.masonry,
+      flooring: analysis.floorArea || avgQty.flooring,
+      plumbingPoints: analysis.bathrooms
+        ? analysis.bathrooms * 5
+        : avgQty.plumbingPoints,
+      electricalPoints: analysis.rooms
+        ? analysis.rooms * 4
+        : avgQty.electricalPoints,
+      paintArea: analysis.wallLength
+        ? analysis.wallLength * 2.5
+        : avgQty.paintArea,
+      fixtures:
+        (analysis.doors || 0) + (analysis.windows || 0)
+        || avgQty.fixtures,
+      labour:
+        analysis.floorArea
+        ? analysis.floorArea * 0.8
+        : avgQty.labour
+    };
 
-    // 🔹 Step 2: Call AI for quality
-    const qualityRes = await axios.post("http://localhost:8000/quality", {
-      floorArea: analysis.floorArea,
-      layoutType: analysis.layoutType,
-      structureComplexity: analysis.structureComplexity
+
+    // 🔹 Live Market Data
+    const steelRate = await getSteelRate() || avgRates.steel;
+    const fuelPrice = await getFuelPrice() || 100;
+    const transportFactor = getTransportFactor(fuelPrice) || 1;
+
+
+    // 🔹 AI Multipliers
+    let multipliers = {
+      budget: {},
+      standard: {},
+      premium: {}
+    };
+
+    try {
+      const qualityRes = await axios.post("http://localhost:8000/quality", {
+        floorArea: analysis.floorArea,
+        layoutType: analysis.layoutType,
+        structureComplexity: analysis.structureComplexity
+      });
+
+      multipliers = qualityRes.data || multipliers;
+    } catch {}
+
+
+    // 🔹 DB Rates
+    const rates = await Rate.find();
+    const rateMap = {};
+
+    rates.forEach(r => {
+      const key = r.material?.trim().toLowerCase();
+      if (!key) return;
+
+      const dbRate = Number(r.rate);
+      rateMap[key] =
+        dbRate && dbRate > 0
+          ? dbRate
+          : avgRates[key];
     });
 
-    const multipliers = qualityRes.data;
+    const getRate = (key) =>
+      rateMap[key] || avgRates[key];
 
-    // 🔹 Step 3: Get base rates
-    const rates = await Rate.find();
 
-    const rateMap = {};
-    rates.forEach(r => rateMap[r.material.toLowerCase()] = r.rate);
+    // 🔹 Base Costs
+    const baseCosts = {
 
-const baseCosts = {
-  structure:
-    (quantities.concrete || 0) *
-      (rateMap["concrete"] ?? defaultRates.concrete) +
-    (quantities.steel || 0) *
-      (steelRate || 75),
+      structure:
+        quantities.concrete * getRate("concrete") +
+        quantities.steel * steelRate,
 
-  masonry:
-    (quantities.masonry || 0) *
-    (rateMap["masonry"] ?? defaultRates.masonry) *
-    transportFactor,
+      masonry:
+        quantities.masonry * getRate("masonry") * transportFactor,
 
-  flooring:
-    (quantities.flooring || 0) *
-    (rateMap["flooring"] ?? defaultRates.flooring) *
-    transportFactor,
+      flooring:
+        quantities.flooring * getRate("flooring") * transportFactor,
 
-  plumbing:
-    (quantities.plumbingPoints || 0) *
-    (rateMap["plumbing"] ?? defaultRates.plumbing),
+      plumbing:
+        quantities.plumbingPoints * getRate("plumbing"),
 
-  electrical:
-    (quantities.electricalPoints || 0) *
-    (rateMap["electrical"] ?? defaultRates.electrical),
+      electrical:
+        quantities.electricalPoints * getRate("electrical"),
 
-  finishing:
-    (quantities.paintArea || 0) *
-    (rateMap["paint"] ?? defaultRates.paint),
+      finishing:
+        quantities.paintArea * getRate("paint"),
 
-  fixtures:
-    (quantities.fixtures || 0) *
-    (rateMap["fixture"] ?? defaultRates.fixture),
+      fixtures:
+        quantities.fixtures * getRate("fixture"),
 
-  labour:
-    (quantities.labour || 0) *
-    (rateMap["labour"] ?? defaultRates.labour)
-};    const estimate = {};
+      labour:
+        quantities.labour * getRate("labour")
+    };
+
+
+    // 🔹 Apply AI Multipliers
+    const estimate = {};
 
     ["budget", "standard", "premium"].forEach(level => {
+
       estimate[level] = {};
 
       Object.keys(baseCosts).forEach(cat => {
-        const base = baseCosts[cat] ?? 0;
-        const factor = multipliers[level]?.[cat]??1;
+
+        const base = baseCosts[cat] || 0;
+        const factor = multipliers[level]?.[cat] || 1;
 
         estimate[level][cat] = {
           low: base * factor * 0.9,
           high: base * factor * 1.1
         };
+
       });
+
     });
-    console.log("Rates:", rateMap);
-    console.log("Quantities:", quantities);
-    console.log("Multipliers:", multipliers);
+
+
     const estimation = await Estimation.create({
       drawingId,
       estimate

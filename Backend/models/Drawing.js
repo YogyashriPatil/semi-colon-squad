@@ -1,5 +1,27 @@
 import mongoose from "mongoose";
+const analysisSchema = new mongoose.Schema({
+  walls: Number,
+  columns: Number,
+  doors: Number,
+  windows: Number,
+  floorArea: Number,
+  rooms: Number,
+  bathrooms: Number,
+  wallLength: Number,
+  slabArea: Number,
+  layoutType: String,
+  structureComplexity: String
 
+}, { _id: false });
+const timelineSchema = new mongoose.Schema({
+  phases: [
+    {
+      phase: String,
+      durationDays: Number
+    }
+  ],
+  totalDuration: Number
+}, { _id: false });
 const drawingSchema = new mongoose.Schema(
   {
     projectId: {
@@ -15,9 +37,14 @@ const drawingSchema = new mongoose.Schema(
       enum: ["uploaded", "processing", "completed"],
       default: "uploaded"
     },
-    analysisResult: {
-      type: mongoose.Schema.Types.Mixed
-    }
+    analysisResult: analysisSchema,
+    pipeline:[
+      {
+        order:Number,
+        stage:String
+      }
+    ],
+    timeline: timelineSchema
   },
   { timestamps: true }
 );

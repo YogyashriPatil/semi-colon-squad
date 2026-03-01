@@ -31,12 +31,21 @@ export const uploadDrawing = async (req, res) => {
       filePath: safePath
     });
     //  // 🔹 Step 4: Save analysis result
-    drawing.status = "completed";
-    drawing.analysisResult = aiResponse.data;
+   
+    drawing.analysisResult = aiResponse.data.analysis.analysis;
+    // drawing.analysis= aiResponse.data.analysis.analysis;
+    drawing.timeline= aiResponse.data.analysis.timeline;
     drawing.filePath = safePath; // optional cleanup
+    drawing.status = "completed";
     await drawing.save();
 
-    res.status(201).json(drawing);
+    res.status(201).json({
+      _id: drawing._id,
+      analysis: {
+        analysis : drawing.analysisResult,
+        timeline: drawing.timeline
+      }
+    });
 
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -1,0 +1,101 @@
+/* OUTER FRAME */
+.auth-outer {
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background: radial-gradient(circle at top,#0a0f2c,#020617);
+  padding:40px;
+}
+
+/* INNER CARD */
+.auth-inner {
+  width:420px;
+  padding:40px;
+  border-radius:22px;
+  background:rgba(15,23,42,0.7);
+  backdrop-filter: blur(18px);
+  border:1px solid rgba(99,102,241,0.4);
+  box-shadow:0 0 60px rgba(99,102,241,0.3);
+  animation: floatCard 6s ease-in-out infinite;
+}
+
+/* TABS */
+.auth-tabs {
+  display:flex;
+  margin-bottom:30px;
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.auth-tabs button {
+  flex:1;
+  padding:12px;
+  background:transparent;
+  border:none;
+  color:#94a3b8;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.auth-tabs button.active {
+  background:linear-gradient(135deg,#4f46e5,#6366f1);
+  color:white;
+  box-shadow:0 0 15px rgba(99,102,241,0.5);
+}
+
+/* FORM */
+.auth-form {
+  display:flex;
+  flex-direction:column;
+}
+
+/* INPUT */
+.auth-input {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:15px;
+  padding:12px;
+  background:rgba(30,41,59,0.6);
+  border-radius:12px;
+  border:1px solid rgba(148,163,184,0.2);
+  transition:0.3s;
+}
+
+.auth-input:hover {
+  border:1px solid rgba(99,102,241,0.5);
+}
+
+.auth-input input {
+  background:transparent;
+  border:none;
+  outline:none;
+  color:white;
+  width:100%;
+}
+
+/* BUTTON */
+.auth-btn {
+  margin-top:20px;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(135deg,#4f46e5,#6366f1);
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.auth-btn:hover {
+  transform:scale(1.05);
+  box-shadow:0 0 20px rgba(99,102,241,0.5);
+}
+
+/* FLOATING ANIMATION */
+@keyframes floatCard {
+  0% { transform:translateY(0px);}
+  50% { transform:translateY(-10px);}
+  100% { transform:translateY(0px);}
+}

@@ -1,9 +1,10 @@
 import {  Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import UploadDrawing from "./components/UploadDrawing";
-import Register from "./pages/Register";
-import Login from "./pages/Login";
 import AppLayout from "./layouts/AppLayout";
+import AuthPage from "./pages/AuthPage";
+import History from "./pages/History";
+import ProjectDetails from "./pages/ProjectDetails";
 function App() {
   return (
     <Routes>
@@ -12,10 +13,10 @@ function App() {
       <Route element={<AppLayout />}>
 
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/" element={<AuthPage />} />
+        <Route path="/history" element={<History />} />
         <Route path="/upload/:projectId" element={<UploadDrawing />} />
-
+        <Route path="/project/:id" element={<ProjectDetails />} />
       </Route>
 
     </Routes>

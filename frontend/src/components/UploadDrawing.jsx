@@ -1,8 +1,9 @@
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
-import { Star , TrendingUp} from "lucide-react";
 import {
+  Star,
+  TrendingUp,
   UploadCloud,
   BarChart3,
   Calculator,
@@ -10,9 +11,29 @@ import {
   GitBranch,
   FileDown,
   FileText,
-  Layers
+  Layers,
+  Globe,
+  Hammer,
+  Building2,
+  BrickWall,
+  Home,
+  Wrench,
+  Zap,
+  Paintbrush
 } from "lucide-react";
+const getPhaseIcon = (phase) => {
+  if (phase?.includes("Site")) return <Globe size={18}/>;
+  if (phase.includes("Foundation")) return <Hammer size={18}/>;
+  if (phase.includes("Plinth")) return <BrickWall size={18}/>;
+  if (phase.includes("Column")) return <Building2 size={18}/>;
+  if (phase.includes("Wall")) return <BrickWall size={18}/>;
+  if (phase.includes("Roof")) return <Home size={18}/>;
+  if (phase.includes("Plumbing")) return <Wrench size={18}/>;
+  if (phase.includes("Electrical")) return <Zap size={18}/>;
+  if (phase.includes("Painting")) return <Paintbrush size={18}/>;
 
+  return <Building2 size={18}/>;
+};
 const UploadDrawing = () => {
   const { projectId } = useParams();
 
@@ -23,9 +44,9 @@ const UploadDrawing = () => {
   const [drawingId, setDrawingId] = useState(null);
   const [analysis, setAnalysis] = useState(null);
   const [estimation, setEstimation] = useState(null);
-  const [timeline, setTimeline] = useState(null);
-  const [pipeline, setPipeline] = useState(null);
-
+  const [timeline, setTimeline] = useState([]);
+  const [pipeline, setPipeline] = useState([]);
+  const [timelineDuration, setTimelineDuration] = useState(0);
   // 🚀 Upload Handler
   const uploadHandler = async () => {
     if (!file) return alert("Select file first!");
@@ -47,22 +68,20 @@ const UploadDrawing = () => {
           },
         }
       );
-
-      const ai = response.data.analysisResult;
-      setAnalysis(ai.analysis);
-
-      // AI timeline (initial)
-      if(ai.timeline){
-        setTimeline({
-          phases: ai.timeline.phases || [],
-          totalDuration: ai.timeline.totalDuration || 0
-        });
+      console.log("FULL RESPONSE 👉", response.data);
+      // const ai = response.data.analysisResult;
+      // setAnalysis(ai.analysis);
+      const ai = response.data.analysis;
+      setAnalysis(ai?.analysis || null);
+      if(ai?.timeline){
+        setTimeline(ai.timeline.phases || []);
+        setTimelineDuration(ai.timeline.totalDuration || 0);
       }
 
       // AI pipeline
-      if(ai.pipeline){
-        setPipeline(ai.pipeline);
-      }
+      // if(ai.pipeline){
+      //   setPipeline(ai.pipeline);
+      // }
       const id = response.data._id;
       setDrawingId(id);
 
@@ -72,24 +91,20 @@ const UploadDrawing = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setEstimation(est.data.estimate);
-
-      const tl = await axios.post(
-        `http://localhost:3000/api/timeline/${id}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setTimeline({
-        phases: tl.data?.phases || [],
-        totalDuration: tl.data?.totalDuration || 0
-      });
-
-      const pipe = await axios.post(
+          // 🔹 GENERATE PIPELINE
+      await axios.post(
         `http://localhost:3000/api/pipeline/${id}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setPipeline(pipe.data?.stages || []);
 
+      // 🔹 FETCH PIPELINE
+      const pipeRes = await axios.get(
+        `http://localhost:3000/api/pipeline/${id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setPipeline(pipeRes.data?.stages || []);
       alert("Upload & Analysis Completed 🚀");
 
     } catch (error) {
@@ -261,101 +276,105 @@ const UploadDrawing = () => {
 
           </div>
         )}
-        {view === "timeline" && timeline?.phases?.length > 0 && (
-          <div className="timeline-roadmap animate-fadeIn">
+        {view === "timeline" && timeline.length > 0 && (
+          <div className="roadmap-wrapper animate-fadeIn">
 
-            <h2 className="timeline-title">
-              <CalendarClock /> Construction Roadmap
-            </h2>
+  <h2 className="roadmap-title">
+    <CalendarClock size={20}/> Construction Execution Flow
+  </h2>
 
-            <div className="timeline-container">
+  <div className="roadmap-container">
 
-              {timeline.phases.map((phase, index) => {
+    {timeline.map((p, i) => {
+      const phaseName = p.phase || p.phaseName;
+      const duration = p.durationDays || p.duration;
+      // const phaseIcon = getPhaseIcon(p.phase);
 
-                const icons = {
-                  "Site Preparation": "🌍",
-                  "Foundation Work": "🏗️",
-                  "Plinth Beam": "🧱",
-                  "Column & Structure": "🏢",
-                  "Wall Construction": "🧱",
-                  "Roof Slab": "🏠",
-                  "Plumbing Rough": "🚰",
-                  "Electrical Rough": "⚡",
-                  "Flooring": "🪵",
-                  "Doors & Windows": "🚪",
-                  "Interior Finishing": "🛋️",
-                  "Painting": "🎨"
-                };
+      return (
+        <div key={i} className="roadmap-step">
 
-                return (
-                  <div key={index} className="timeline-step">
+          {/* FLOW LINE */}
+          {i !== timeline.length - 1 && (
+            <div className="roadmap-line" />
+          )}
 
-                    {/* Connector Line */}
-                    {index !== 0 && <div className="timeline-line" />}
-
-                    {/* Circle */}
-                    <div className="timeline-circle">
-                      {icons[phase.phase] || "🏗️"}
-                    </div>
-
-                    {/* Content */}
-                    <div className="timeline-content">
-                      <p className="timeline-phase">{phase.phase}</p>
-                      <p className="timeline-duration">
-                        {phase.durationDays} Days
-                      </p>
-                    </div>
-
-                  </div>
-                );
-              })}
-
-            </div>
-
-            {/* Total Duration */}
-            <div className="timeline-total">
-              Total Duration : {timeline.totalDuration} Days
-            </div>
-
-            {/* Download */}
-            <div className="flex justify-center gap-4 mt-6">
-              <button
-                onClick={() => downloadSectionReport("timeline")}
-                className="download-btn"
-              >
-                <FileDown size={16}/> PDF
-              </button>
-              <button
-                onClick={() => downloadSectionReport("timeline")}
-                className="download-btn"
-              >
-                <FileText size={16}/> Excel
-              </button>
-            </div>
-
+          {/* NODE */}
+          <div className="roadmap-node">
+            {getPhaseIcon(phaseName)}
           </div>
-        )}
-        {view === "pipeline" && pipeline && (
-          <div className="report-card">
-            <h3><GitBranch /> Pipeline</h3>
 
-            {pipeline.map(stage => (
-              <div key={stage.order}>
-                {stage.order}. {stage.stage}
+          {/* CARD */}
+          <div className="roadmap-card">
+            <h4>{phaseName}</h4>
+            <span>{duration} Days</span>
+          </div>
+        </div>
+      );
+    })}
+
+  </div>
+
+  <p className="roadmap-total">
+    Total Duration :  {
+      timelineDuration ||
+      timeline.reduce((sum, p) => sum + (p.durationDays || 0), 0)
+    } Days
+  </p>
+
+  <div className="flex justify-center gap-4 mt-6">
+    <button onClick={()=>downloadSectionReport("timeline")} className="download-btn">
+      <FileDown size={16}/> PDF
+    </button>
+    <button onClick={()=>downloadSectionReport("timeline")} className="download-btn">
+      <FileText size={16}/> Excel
+    </button>
+  </div>
+
+</div>
+        )}
+    {view === "pipeline" && pipeline?.length > 0 && (
+      <div className="pipeline-wrapper animate-fadeIn">
+
+        <h2 className="pipeline-title">
+          <GitBranch size={20}/> Construction Pipeline
+        </h2>
+
+        <div className="pipeline-timeline">
+
+          {pipeline.map((stage, i) => (
+            <div key={stage.order} className="pipeline-step">
+
+              {i !== pipeline.length - 1 && (
+                <div className="pipeline-line" />
+              )}
+
+              <div className="pipeline-node">
+                {getPhaseIcon(stage.stage)}
               </div>
-            ))}
 
-            <div className="download-actions">
-              <button onClick={() => downloadSectionReport("pipeline")}>
-                <FileDown size={16}/> PDF
-              </button>
-              <button onClick={() => downloadSectionReport("pipeline")}>
-                <FileText size={16}/> Excel
-              </button>
+              <div className="pipeline-card">
+                <span className="pipeline-order">
+                  Step {stage.order}
+                </span>
+                <h4>{stage.stage}</h4>
+              </div>
+
             </div>
-          </div>
-        )}
+          ))}
 
+        </div>
+
+        <div className="download-actions">
+          <button onClick={() => downloadSectionReport("pipeline")} className="download-btn">
+            <FileDown size={16}/> PDF
+          </button>
+          <button onClick={() => downloadSectionReport("pipeline")} className="download-btn">
+            <FileText size={16}/> Excel
+          </button>
+        </div>
+
+      </div>
+    )}
       </div>
     </div>
   );

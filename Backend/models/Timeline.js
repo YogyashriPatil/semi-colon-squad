@@ -1,23 +1,18 @@
 import mongoose from "mongoose";
 
 const phaseSchema = new mongoose.Schema({
-  phaseName: String,
-  durationDays: Number,
-  startDate: Date,
-  endDate: Date
+  phase: String,
+  durationDays: Number
 });
 
-const timelineSchema = new mongoose.Schema(
-  {
-    estimationId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Estimation",
-      required: true
-    },
-    projectStartDate: Date,
-    phases: [ phaseSchema]
+const timelineSchema = new mongoose.Schema({
+  drawingId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Drawing",
+    required: true
   },
-  { timestamps: true }
-);
+  phases: [phaseSchema],
+  totalDuration: Number
+});
 
 export default mongoose.model("Timeline", timelineSchema);

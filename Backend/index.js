@@ -11,6 +11,9 @@ import reportRoutes from "./routes/reportRoutes.js";
 import uploadRoute from "./routes/uploadRoute.js"
 import rateRoutes from "./routes/rateRoutes.js";
 import pipelineRoutes from "./routes/pipelineRoutes.js"
+import historyRoutes from "./routes/historyRoutes.js";
+import projectDetailsRoutes from "./routes/projectDetailsRoutes.js"
+
 dotenv.config();
 connectDB(); 
 
@@ -29,7 +32,8 @@ app.use("/api/timeline",timelineRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/rates",rateRoutes);
 app.use("/api/pipeline", pipelineRoutes);
-
+app.use("/api/history",historyRoutes)
+app.use("/api/project-details", projectDetailsRoutes)
 app.use("/upload", uploadRoute);
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
