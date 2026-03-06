@@ -4,6 +4,7 @@ import UploadDrawing from "./components/UploadDrawing";
 import AppLayout from "./layouts/AppLayout";
 import AuthPage from "./pages/AuthPage";
 import History from "./pages/History";
+import Profile from "./pages/Profile";
 import ProjectDetails from "./pages/ProjectDetails";
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/" element={<AuthPage />} />
         <Route path="/history" element={<History />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/upload/:projectId" element={<UploadDrawing />} />
         <Route path="/project/:id" element={<ProjectDetails />} />
       </Route>

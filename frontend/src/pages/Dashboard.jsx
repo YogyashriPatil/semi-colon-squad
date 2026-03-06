@@ -1,5 +1,5 @@
 import ProfileMenu from "../components/ProfileMenu";
-import { useState,useEffect } from "react";
+import { useState,useEffect , useRef } from "react";
 import logo from "../assets/logo.jpeg";
 import heroVideo from "../assets/video.mp4";
 import { User } from "lucide-react";
@@ -7,15 +7,42 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function Dashboard() {
-
+  const menuRef = useRef();
+  const [profile, setProfile] = useState(null);
+  const [stats, setStats] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => {
-    const close = () => setMenuOpen(false);
+    const close = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+
     window.addEventListener("click", close);
     return () => window.removeEventListener("click", close);
   }, []);
+  useEffect(() => {
+      const fetchProfile = async () => {
+        try {
+          const token = localStorage.getItem("token");
+
+          const res = await axios.get(
+            "http://localhost:3000/api/auth/profile",
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          setProfile(res.data.user);
+          setStats(res.data.stats);
+
+        } catch (err) {
+          console.log("Profile load failed");
+        }
+      };
+
+      fetchProfile();
+    }, []);
   return (
     <div className="dashboard-container text-white">
 
@@ -38,7 +65,7 @@ export default function Dashboard() {
             hover:shadow-[0_0_20px_rgba(99,102,241,0.5)]
             transition
           ">
-            <div className="relative">
+            <div className="relative profile-icon-wrapper" ref={menuRef}>
 
             <div
               onClick={(e) => {
@@ -56,7 +83,7 @@ export default function Dashboard() {
               <User size={22}/>
             </div>
 
-            <ProfileMenu open={menuOpen} setOpen={setMenuOpen} />
+            <ProfileMenu open={menuOpen} setOpen={setMenuOpen} profile={profile} stats={stats}/>
 
           </div>
           </div>

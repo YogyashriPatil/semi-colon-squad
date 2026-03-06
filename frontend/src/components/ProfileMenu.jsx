@@ -1,9 +1,19 @@
 import { useNavigate } from "react-router-dom";
-import { History, User, LogOut } from "lucide-react";
+import { History, User, Mail, ShieldCheck, Folder, LogOut } from "lucide-react";
 
-export default function ProfileMenu({ open, setOpen }) {
+export default function ProfileMenu({ open, setOpen, profile, stats }) {
 
   const navigate = useNavigate();
+
+  const goProfile = () => {
+    setOpen(false);
+    navigate("/profile");
+  };
+
+  const goHistory = () => {
+    setOpen(false);
+    navigate("/history");
+  };
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -13,33 +23,37 @@ export default function ProfileMenu({ open, setOpen }) {
   if (!open) return null;
 
   return (
-    <div className="absolute right-0 mt-3 w-48 z-50 animate-dropdown">
+<div className="menu-container">
 
-      <div className="bg-white/10 backdrop-blur-xl border border-indigo-400/20 rounded-xl shadow-[0_0_30px_rgba(99,102,241,0.3)] overflow-hidden">
+      <div className="menu-card">
 
-        <button
-          onClick={() => navigate("/history")}
-          className="menu-item"
-        >
-          <History size={16}/> History
-        </button>
+        <div className="menu-item" onClick={goProfile}>
+          <User size={18}/>
+          <span>Profile</span>
+        </div>
 
-        <button
-          onClick={() => navigate("/profile")}
-          className="menu-item"
-        >
-          <User size={16}/> Profile
-        </button>
+        <div className="menu-item" onClick={goHistory}>
+          <History size={18}/>
+          <span>History</span>
+        </div>
 
-        <button
-          onClick={logout}
-          className="menu-item text-red-400"
-        >
-          <LogOut size={16}/> Logout
-        </button>
+        <div className="menu-item logout" onClick={logout}>
+          <LogOut size={18}/>
+          <span>Logout</span>
+        </div>
 
       </div>
 
     </div>
-  );
+      );
 }
+
+const ProfileRow = ({ icon, label, value }) => (
+  <div className="profile-row">
+    <div className="row-left">
+      {icon}
+      <span>{label}</span>
+    </div>
+    <p>{value}</p>
+  </div>
+);

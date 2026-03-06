@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from structure_builder import process_file
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
@@ -8,169 +9,9 @@ def analyze(data: dict):
     file_path = data["filePath"]
     result = process_file(file_path)
     return result
-# from fastapi import FastAPI
-# from pydantic import BaseModel
-# from google import genai
-# import base64
-# import os
-# import json
-# import fitz
-# import ezdxf
 
-# import ssl
-# import certifi
+app.mount("/files", StaticFiles(directory="reports"), name="files")
 
-# ssl._create_default_https_context = ssl.create_default_context
-# ssl._create_default_https_context(cafile=certifi.where())
-# app = FastAPI()
-
-
-
-# def parse_ai_output(text):
-#     try:
-#         text = text.replace("```json", "").replace("```", "").strip()
-#         return json.loads(text)
-#     except:
-#         return {}
-
-# class FileRequest(BaseModel):
-#     filePath: str
-
-# def get_mime_type(path):
-#     ext = os.path.splitext(path)[1].lower()
-#     if ext == ".png":
-#         return "image/png"
-#     elif ext in [".jpg", ".jpeg"]:
-#         return "image/jpeg"
-#     return "image/png"
-
-
-# def image_to_base64(path):
-#     with open(path, "rb") as img:
-#         return base64.b64encode(img.read()).decode("utf-8")
-
-# def analyze_pdf(file_path):
-#     doc = fitz.open(file_path)
-#     wall_lines = 0
-#     for page in doc:
-#         drawings = page.get_drawings()
-
-#         for d in drawings:
-#             if d["type"] == "l":   # line
-#                 wall_lines += 1
-
-#     floor_area = wall_lines * 20
-#     wall_length = wall_lines * 3
-
-#     rooms = max(2, wall_lines // 10)
-#     bathrooms = max(1, rooms // 2)
-#     doors = rooms * 2
-#     windows = rooms * 2
-#     columns = max(4, rooms)
-
-#     concrete = floor_area * 0.15
-#     steel = concrete * 0.12
-
-#     return {
-#         "walls": wall_lines,
-#         "columns": columns,
-#         "doors": doors,
-#         "windows": windows,
-#         "floorArea": floor_area,
-#         "rooms": rooms,
-#         "bathrooms": bathrooms,
-#         "wallLength": wall_length,
-#         "layoutType": "standard",
-#         "structureComplexity": "medium",
-#         "slabArea": floor_area,
-#         "concrete": concrete,
-#         "steel": steel
-#     }
-
-# def analyze_cad(file_path):
-
-#     doc = ezdxf.readfile(file_path)
-#     msp = doc.modelspace()
-
-#     walls = 0
-#     columns = 0
-#     doors = 0
-#     windows = 0
-
-#     for e in msp:
-
-#         t = e.dxftype()
-
-#         if t in ["LINE", "LWPOLYLINE", "POLYLINE"]:
-#             walls += 1
-
-#         elif t == "CIRCLE":
-#             columns += 1
-
-#         elif t == "ARC":
-#             doors += 1
-
-#         elif t == "INSERT":
-#             name = e.dxf.name.lower()
-
-#             if "door" in name:
-#                 doors += 1
-#             elif "window" in name:
-#                 windows += 1
-
-#     floor_area = max(500, walls * 25)
-
-#     wall_length = walls * 4
-#     rooms = max(2, walls // 6)
-#     bathrooms = max(1, rooms // 2)
-
-#     concrete = floor_area * 0.15
-#     steel = concrete * 0.12
-
-#     return {
-#         "walls": walls,
-#         "columns": columns,
-#         "doors": doors,
-#         "windows": windows,
-#         "floorArea": floor_area,
-#         "rooms": rooms,
-#         "bathrooms": bathrooms,
-#         "wallLength": wall_length,
-#         "layoutType": "standard",
-#         "structureComplexity": "medium",
-#         "slabArea": floor_area,
-#         "concrete": concrete,
-#         "steel": steel
-#     }
-# def detect_file_type(path):
-#     ext = os.path.splitext(path)[1].lower()
-    
-#     if ext in [".jpg", ".jpeg", ".png"]:
-#         return "image"
-#     elif ext == ".pdf":
-#         return "pdf"
-#     elif ext in [".dxf", ".dwg"]:
-#         return "cad"
-#     return "unknown"
-
-
-# @app.post("/analyze")
-# def analyze(req: FileRequest):
-#     file_type = detect_file_type(req.filePath)
-
-#     if file_type == "image":
-#         result = analyze_image_with_gemini(req.filePath)
-#     elif file_type == "pdf":
-#         result = analyze_pdf(req.filePath)
-
-#     elif file_type == "cad":
-#         result = analyze_cad(req.filePath)
-
-#     else:
-#         return {"error": "Unsupported file"}
-
-#     result["fileType"] = file_type
-#     return result
 @app.post("/quality")
 def quality(data: dict):
 
@@ -327,10 +168,17 @@ def timeline(data: dict):
 
     totalWeeks = max([p["startWeek"] + p["duration"] for p in timeline])
 
+    phases = []
+
+    for p in timeline:
+        phases.append({
+            "phase": p["phase"],
+            "durationDays": int(p["duration"] * 7)
+        })
+
     return {
-        "timeline": timeline,
-        "totalWeeks": totalWeeks,
-        "totalMonths": round(totalWeeks / 4, 1)
+        "phases": phases,
+        "totalDuration": sum(p["durationDays"] for p in phases)
     }
 from pipeline_engine import generate_pipeline
 
@@ -347,8 +195,8 @@ def report(data: dict):
     excel = generate_excel(data)
 
     return {
-        "pdf": pdf,
-        "excel": excel
+        "pdf": f"/files/{pdf.split('/')[-1]}",
+        "excel": f"/files/{excel.split('/')[-1]}"
     }
 # # import os
 # # from structure_builder import build_structure

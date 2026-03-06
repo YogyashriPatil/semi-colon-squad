@@ -116,25 +116,25 @@ const UploadDrawing = () => {
   };
 
   // 📄 Section Download
-  const downloadSectionReport = async (type) => {
-    if (!drawingId) return alert("Upload first!");
+const downloadSectionReport = async (type) => {
 
-    const token = localStorage.getItem("token");
+  if (!drawingId) return alert("Upload first!");
 
-    const res = await axios.post(
-      `http://localhost:3000/api/reports/${drawingId}`,
-      { type },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+  const token = localStorage.getItem("token");
 
-    if (res.data.pdf) {
-      window.open(`http://localhost:8000/${res.data.pdf}`);
-    }
-    if (res.data.excel) {
-      window.open(`http://localhost:8000/${res.data.excel}`);
-    }
-  };
+  const res = await axios.get(
+    `http://localhost:3000/api/reports/${drawingId}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
 
+  // Decide file
+  const filePath = type === "excel" ? res.data.excel : res.data.pdf;
+
+  // Create download link
+  // Open in new tab 🚀
+    window.open(`http://localhost:8000${filePath}`, "_blank");
+
+};
   return (
     <div className="upload-wrapper">
 
@@ -259,14 +259,14 @@ const UploadDrawing = () => {
             <div className="flex justify-center gap-4 mt-8">
 
               <button
-                onClick={()=>downloadSectionReport("estimation")}
+                onClick={()=>downloadSectionReport("pdf")}
                 className="download-btn"
               >
                 <FileDown size={16}/> PDF
               </button>
 
               <button
-                onClick={()=>downloadSectionReport("estimation")}
+                onClick={()=>downloadSectionReport("excel")}
                 className="download-btn"
               >
                 <FileText size={16}/> Excel
@@ -315,17 +315,14 @@ const UploadDrawing = () => {
   </div>
 
   <p className="roadmap-total">
-    Total Duration :  {
-      timelineDuration ||
-      timeline.reduce((sum, p) => sum + (p.durationDays || 0), 0)
-    } Days
+    Total Duration : {timeline.totalDuration} Days
   </p>
 
   <div className="flex justify-center gap-4 mt-6">
-    <button onClick={()=>downloadSectionReport("timeline")} className="download-btn">
+    <button onClick={()=>downloadSectionReport("pdf")} className="download-btn">
       <FileDown size={16}/> PDF
     </button>
-    <button onClick={()=>downloadSectionReport("timeline")} className="download-btn">
+    <button onClick={()=>downloadSectionReport("excel")} className="download-btn">
       <FileText size={16}/> Excel
     </button>
   </div>
@@ -365,10 +362,10 @@ const UploadDrawing = () => {
         </div>
 
         <div className="download-actions">
-          <button onClick={() => downloadSectionReport("pipeline")} className="download-btn">
+          <button onClick={() => downloadSectionReport("pdf")} className="download-btn">
             <FileDown size={16}/> PDF
           </button>
-          <button onClick={() => downloadSectionReport("pipeline")} className="download-btn">
+          <button onClick={() => downloadSectionReport("excel")} className="download-btn">
             <FileText size={16}/> Excel
           </button>
         </div>

@@ -27,7 +27,6 @@ def generate_timeline(data):
     ]
 
     phases = []
-
     total = 0
 
     for name, base in timeline:

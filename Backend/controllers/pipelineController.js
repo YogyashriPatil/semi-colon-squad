@@ -1,5 +1,8 @@
 import Drawing from "../models/Drawing.js";
+import Pipeline from "../models/Pipeline.js";
+import axios from "axios";
 
+// 🔹 Generate Pipeline
 export const generatePipeline = async (req, res) => {
   try {
     const { drawingId } = req.params;
@@ -9,52 +12,34 @@ export const generatePipeline = async (req, res) => {
     if (!drawing || !drawing.analysisResult)
       return res.status(400).json({ message: "Analysis missing" });
 
-    const analysis = drawing.analysisResult;  // ⭐ Now correct structure
+    const aiRes = await axios.post("http://localhost:8000/pipeline", {
+      analysis: drawing.analysisResult
+    });
 
-    const pipeline = [];
+    const pipeline = await Pipeline.findOneAndUpdate(
+      { drawingId },
+      { drawingId, stages: aiRes.data.pipeline },
+      { new: true, upsert: true }
+    );
 
-    pipeline.push({ order: 1, stage: "Site Preparation" });
-    pipeline.push({ order: 2, stage: "Foundation Work" });
-
-    if (analysis.structureComplexity === "high") {
-      pipeline.push({ order: 3, stage: "Reinforced Column Structure" });
-    } else {
-      pipeline.push({ order: 3, stage: "Standard Column Structure" });
-    }
-
-    pipeline.push({ order: 4, stage: "Wall Construction" });
-    pipeline.push({ order: 5, stage: "Roof Slab" });
-
-    if (analysis.rooms > 3) {
-      pipeline.push({ order: 6, stage: "Advanced Plumbing" });
-    } else {
-      pipeline.push({ order: 6, stage: "Basic Plumbing" });
-    }
-
-    pipeline.push({ order: 7, stage: "Electrical Work" });
-    pipeline.push({ order: 8, stage: "Interior Finishing" });
-    pipeline.push({ order: 9, stage: "Painting" });
-
-    // 💾 Save inside Drawing
-    drawing.pipeline = pipeline;
-    await drawing.save();
-
-    res.json({ stages: pipeline });
+    res.json(pipeline);
 
   } catch (err) {
-    console.error("Pipeline error:", err);   // ⭐ Add this for debugging
     res.status(500).json({ error: err.message });
   }
 };
+
 // 🔹 Get Pipeline
 export const getPipeline = async (req, res) => {
   try {
-    const drawing = await Drawing.findById(req.params.drawingId);
+    const pipeline = await Pipeline.findOne({
+      drawingId: req.params.drawingId
+    });
 
-    if (!drawing || !drawing.pipeline)
+    if (!pipeline)
       return res.status(404).json({ message: "Pipeline not found" });
 
-    res.json({ stages: drawing.pipeline });
+    res.json(pipeline);
 
   } catch (err) {
     res.status(500).json({ error: err.message });

@@ -1,5 +1,5 @@
 from google import genai
-client = genai.Client(api_key="AIzaSyB-7ZbISu6JlzmWFFLxC653CIDGZrZbMBo")
+client = genai.Client(api_key="")
 
 def analyze_plan_json(plan_json):
     prompt = f"""

@@ -65,3 +65,17 @@ export const login = async (req, res) => {
 export const logout = async (req, res) => {
   res.json({ message: "Logout successful (delete token on client side)" });
 };
+
+export const getProfile = async (req, res) => {
+  try {
+    res.json({
+      _id: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+      role: req.user.role,
+      createdAt: req.user.createdAt
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch profile" });
+  }
+};
